@@ -66,7 +66,7 @@ class DustCompiler:
                 source = f.read()
 
             # Create output file with .sasm extension
-            output_path = input_path.with_suffix(".sasm")
+            output_path = input_path.with_suffix(".bovtecode")
             
             # Convert and write each line
             with open(output_path, "w", encoding="utf-8") as f:

@@ -2200,7 +2200,7 @@ class CodeIsNoneError(Exception):
 # Dust.py (원래 코드)
 from sys import argv
 import sys
-
+from typing import *
 import sys
 from pathlib import Path
 
@@ -2268,7 +2268,7 @@ def main():
     executor = DustExecutor()
     
     if executor.execute_file(input_path):
-        print("Program executed successfully")
+        pass
     else:
         print("Execution failed")
         sys.exit(1)
