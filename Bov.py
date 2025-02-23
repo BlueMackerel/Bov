@@ -208,7 +208,6 @@ class Lexer:
         self.advance()
       elif self.current_char == '^':
         tokens.append(Token(TT_POW, pos_start=self.pos))
-        self.advance()
       elif self.current_char == '(':
         tokens.append(Token(TT_LPAREN, pos_start=self.pos))
         self.advance()
@@ -267,8 +266,8 @@ class Lexer:
     self.advance()
 
     escape_characters = {
-      '/n': '\n',
-      '/\t': '\t'
+      'n': '\n',
+      't': '\t'
     }
 
     while self.current_char != None and (self.current_char != '"' or escape_character):

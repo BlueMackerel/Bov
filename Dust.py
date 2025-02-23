@@ -1,9 +1,7 @@
-from sys import argv
-import sys
 #######################################
 # IMPORTS
 #######################################
-
+DEBUG=False
 from strings_with_arrows import *
 
 import string
@@ -269,8 +267,8 @@ class Lexer:
     self.advance()
 
     escape_characters = {
-      'n': '\n',
-      't': '\t'
+      '/n': '\n',
+      '/\t': '\t'
     }
 
     while self.current_char != None and (self.current_char != '"' or escape_character):
@@ -1685,9 +1683,13 @@ class BuiltInFunction(BaseFunction):
   #####################################
 
   def execute_print(self, exec_ctx):
-    print(str(exec_ctx.symbol_table.get('value')))
+    print(str(exec_ctx.symbol_table.get('value')),end="")
     return RTResult().success(Number.null)
   execute_print.arg_names = ['value']
+  def execute_println(self, exec_ctx):
+    print(str(exec_ctx.symbol_table.get('value')))
+    return RTResult().success(Number.null)
+  execute_println.arg_names = ['value']
   
   def execute_print_ret(self, exec_ctx):
     return RTResult().success(String(str(exec_ctx.symbol_table.get('value'))))
@@ -1848,7 +1850,7 @@ class BuiltInFunction(BaseFunction):
     return RTResult().success(Number.null)
   execute_run.arg_names = ["fn"]
 
-BuiltInFunction.print       = BuiltInFunction("print")
+BuiltInFunction.print       = BuiltInFunction("println")
 BuiltInFunction.print_ret   = BuiltInFunction("print_ret")
 BuiltInFunction.input       = BuiltInFunction("input")
 BuiltInFunction.input_int   = BuiltInFunction("input_int")
@@ -2158,7 +2160,7 @@ global_symbol_table.set("NULL", Number.null)
 global_symbol_table.set("FALSE", Number.false)
 global_symbol_table.set("TRUE", Number.true)
 global_symbol_table.set("MATH_PI", Number.math_PI)
-global_symbol_table.set("PRINT", BuiltInFunction.print)
+global_symbol_table.set("PRINTLN", BuiltInFunction.print)
 global_symbol_table.set("PRINT_RET", BuiltInFunction.print_ret)
 global_symbol_table.set("INPUT", BuiltInFunction.input)
 global_symbol_table.set("INPUT_INT", BuiltInFunction.input_int)
@@ -2184,6 +2186,7 @@ def run(fn, text):
   # Generate AST
   parser = Parser(tokens)
   ast = parser.parse()
+  if DEBUG:print(ast.error,ast.node)
   if ast.error: return None, ast.error
 
   # Run program
@@ -2191,7 +2194,7 @@ def run(fn, text):
   context = Context('<program>')
   context.symbol_table = global_symbol_table
   result = interpreter.visit(ast.node, context)
-
+  if DEBUG:print(tokens)
   return result.value, result.error
 class CodeIsNoneError(Exception):
     def __str__(self):
@@ -2200,7 +2203,7 @@ class CodeIsNoneError(Exception):
 # Dust.py (원래 코드)
 from sys import argv
 import sys
-from typing import *
+from typing import Dict
 import sys
 from pathlib import Path
 
@@ -2241,9 +2244,9 @@ class DustExecutor:
                 # Convert bytecode to text
                 text = self.from_bytecode(line)
                 # Execute the converted text
-                run("<stdio>",text)
+                result,error=run("Dust",text)
 
-            return True
+            return result,error
 
 
     def from_bytecode(self, bytecode: str) -> str:
@@ -2259,19 +2262,23 @@ class DustExecutor:
 def main():
     """Main entry point for the Dust executor."""
     # Check command line arguments
-    if len(sys.argv) != 2:
-        print("Usage: python dust.py <input_file>")
-        print("Example: python dust.py program.sasm")
-        sys.exit(1)
+    if __name__ == "__main__":
+      if len(sys.argv) != 2:
+          print("Usage: Dust <input_file>")
+          print("Example: Dust program.sasm")
+          sys.exit(1)
 
-    input_path = Path(sys.argv[1])
-    executor = DustExecutor()
-    
-    if executor.execute_file(input_path):
-        pass
-    else:
-        print("Execution failed")
-        sys.exit(1)
+      input_path = Path(sys.argv[1])
+      executor = DustExecutor()
+      
+      result,error=executor.execute_file(input_path)
+      if error:
+                      print(error.as_string())
+      elif result:
+                  if isinstance(result, List) and len(result.elements) == 1:
+                      print(repr(result.elements[0]))
+                  else:
+                      print(repr(result))
 
 if __name__ == "__main__":
     main()
