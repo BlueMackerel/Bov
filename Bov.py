@@ -1,6 +1,7 @@
 #######################################
 # IMPORTS
 #######################################
+
 DEBUG=False
 from strings_with_arrows import *
 
@@ -1845,10 +1846,42 @@ class BuiltInFunction(BaseFunction):
         error.as_string(),
         exec_ctx
       ))
-
-    return RTResult().success(Number.null)
+    return RTResult().success(Number.null)      
   execute_run.arg_names = ["fn"]
+  def execute_stdrun(self, exec_ctx):
+      fn = exec_ctx.symbol_table.get("fn")
 
+      if not isinstance(fn, String):
+        return RTResult().failure(RTError(
+          self.pos_start, self.pos_end,
+          "Second argument must be string",
+          exec_ctx
+        ))
+
+      fn = fn.value
+
+      try:
+        with open(f'{os.environ['BOVPATH']}\\{fn}', "r") as f:
+          script = f.read()
+      except Exception as e:
+        return RTResult().failure(RTError(
+          self.pos_start, self.pos_end,
+          f"Failed to load script \"{fn}\"\n" + str(e),
+          exec_ctx
+        ))
+
+      _, error = run(fn, script)
+      
+      if error:
+        return RTResult().failure(RTError(
+          self.pos_start, self.pos_end,
+          f"Failed to finish executing script \"{fn}\"\n" +
+          error.as_string(),
+          exec_ctx
+        ))
+
+      return RTResult().success(Number.null)
+  execute_stdrun.arg_names = ["fn"]
 BuiltInFunction.print       = BuiltInFunction("println")
 BuiltInFunction.print_ret   = BuiltInFunction("print_ret")
 BuiltInFunction.input       = BuiltInFunction("input")
@@ -1863,6 +1896,7 @@ BuiltInFunction.pop         = BuiltInFunction("pop")
 BuiltInFunction.extend      = BuiltInFunction("extend")
 BuiltInFunction.len					= BuiltInFunction("len")
 BuiltInFunction.run					= BuiltInFunction("run")
+BuiltInFunction.stdrun					= BuiltInFunction("stdrun")
 
 #######################################
 # CONTEXT
@@ -2173,6 +2207,7 @@ global_symbol_table.set("APPEND", BuiltInFunction.append)
 global_symbol_table.set("POP", BuiltInFunction.pop)
 global_symbol_table.set("EXTEND", BuiltInFunction.extend)
 global_symbol_table.set("LEN", BuiltInFunction.len)
+global_symbol_table.set("STDINCLUDE", BuiltInFunction.stdrun)
 global_symbol_table.set("INCLUDE", BuiltInFunction.run)
 global_symbol_table.set("ARGV", List([String(arg) for arg in sys.argv]))
 
