@@ -40,7 +40,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\projects\Bov\Script\*.*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-
+Source: "C:\projects\Bov\Script\dist\Bov.exe"; DestDir: "{app}"; Flags: ignoreversion
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
     ValueType: string; ValueName: "BOVPATH"; ValueData: "{app}\Lib"; Flags: preservestringtype

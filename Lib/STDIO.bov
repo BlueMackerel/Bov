@@ -7,3 +7,4 @@ FUN MUL(a,b) -> a*b
 
 FUN DIV(a,b) -> a/b
 
+FUN POW(a,b) -> a^b
