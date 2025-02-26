@@ -6,6 +6,4 @@ VAR NILL="NULL"
 
 FUN BOOL(object)
     IF object THEN RETURN TRUE
-
-
 END
