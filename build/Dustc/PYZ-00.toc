@@ -1,4 +1,4 @@
-('C:\\projects\\Bov\\Script\\build\\Dustc\\PYZ-00.pyz',
+('C:\\projects\\Bov\\build\\Dustc\\PYZ-00.pyz',
  [('_compat_pickle',
    'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\_compat_pickle.py',
    'PYMODULE'),
